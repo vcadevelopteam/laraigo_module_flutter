@@ -1,0 +1,93 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter pub get
+
+## exception
+
+FileSystemException: FileSystemException: Deletion failed, path = 'C:\Coding\laraigo_chat_module\.android' (OS Error: The process cannot access the file because it is being used by another process.
+, errno = 32)
+
+```
+#0      _Directory._deleteSync (dart:io/directory_impl.dart:193:7)
+#1      FileSystemEntity.deleteSync (dart:io/file_system_entity.dart:424:7)
+#2      ForwardingFileSystemEntity.deleteSync (package:file/src/forwarding/forwarding_file_system_entity.dart:70:16)
+#3      ErrorHandlingDirectory.deleteSync.<anonymous closure> (package:flutter_tools/src/base/error_handling_io.dart:487:22)
+#4      _runSync (package:flutter_tools/src/base/error_handling_io.dart:600:14)
+#5      ErrorHandlingDirectory.deleteSync (package:flutter_tools/src/base/error_handling_io.dart:486:12)
+#6      ErrorHandlingFileSystem.deleteIfExists (package:flutter_tools/src/base/error_handling_io.dart:82:12)
+#7      AndroidProject._regenerateLibrary (package:flutter_tools/src/project.dart:556:29)
+#8      AndroidProject.ensureReadyForPlatformSpecificTooling (package:flutter_tools/src/project.dart:531:13)
+#9      FlutterProject.ensureReadyForPlatformSpecificTooling (package:flutter_tools/src/project.dart:359:21)
+<asynchronous suspension>
+#10     PackagesGetCommand.runCommand (package:flutter_tools/src/commands/packages.dart:179:5)
+<asynchronous suspension>
+#11     FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1257:27)
+<asynchronous suspension>
+#12     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:150:19)
+<asynchronous suspension>
+#13     CommandRunner.runCommand (package:args/command_runner.dart:209:13)
+<asynchronous suspension>
+#14     FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:283:9)
+<asynchronous suspension>
+#15     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:150:19)
+<asynchronous suspension>
+#16     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:229:5)
+<asynchronous suspension>
+#17     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:64:9)
+<asynchronous suspension>
+#18     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:150:19)
+<asynchronous suspension>
+#19     main (package:flutter_tools/executable.dart:91:3)
+<asynchronous suspension>
+```
+
+## flutter doctor
+
+```
+[✓] Flutter (Channel stable, 3.7.0, on Microsoft Windows [Version 10.0.22621.1413], locale en-US)
+    • Flutter version 3.7.0 on channel stable at C:\Coding\flutter\flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision b06b8b2710 (7 weeks ago), 2023-01-23 16:55:55 -0800
+    • Engine revision b24591ed32
+    • Dart version 2.19.0
+    • DevTools version 2.20.1
+
+[✓] Windows Version (Installed version of Windows is version 10 or higher)
+
+[✓] Android toolchain - develop for Android devices (Android SDK version 33.0.1)
+    • Android SDK at C:\Users\rauli\AppData\Local\Android\sdk
+    • Platform android-33-ext4, build-tools 33.0.1
+    • Java binary at: C:\Coding\jdk-11.0.16_windows-x64_bin\jdk-11.0.16\bin\java
+    • Java version Java(TM) SE Runtime Environment 18.9 (build 11.0.16+11-LTS-199)
+    • All Android licenses accepted.
+
+[✗] Chrome - develop for the web (Cannot find Chrome executable at .\Google\Chrome\Application\chrome.exe)
+    ! Cannot find Chrome. Try setting CHROME_EXECUTABLE to a Chrome executable.
+
+[✗] Visual Studio - develop for Windows
+    ✗ Visual Studio not installed; this is necessary for Windows development.
+      Download at https://visualstudio.microsoft.com/downloads/.
+      Please install the "Desktop development with C++" workload, including all of its default components
+
+[!] Android Studio (version 2022.1)
+    • Android Studio at C:\Program Files\Android\Android Studio
+    • Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    • Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    ✗ Unable to find bundled Java version.
+    • Try updating or re-installing Android Studio.
+
+[✓] Connected device (3 available)
+    • sdk gphone x86 (mobile) • emulator-5554 • android-x86    • Android 11 (API 30) (emulator)
+    • Windows (desktop)       • windows       • windows-x64    • Microsoft Windows [Version 10.0.22621.1413]
+    • Edge (web)              • edge          • web-javascript • Microsoft Edge 110.0.1587.69
+
+[✓] HTTP Host Availability
+    • All required HTTP hosts are available
+
+! Doctor found issues in 3 categories.
+```
