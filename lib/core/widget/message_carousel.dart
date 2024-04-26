@@ -54,7 +54,7 @@ class MessageCarousel extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 5),
                         child: Text(
-                          buttons[0].text!,
+                          buttons[indx].text!,
                           style: TextStyle(
                               color: HexColor(color.messageClientColor!),
                               fontWeight: FontWeight.w600,
@@ -193,7 +193,7 @@ class MessageCarousel extends StatelessWidget {
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 8.0),
                                 child: SizedBox(
-                                    height: 40,
+                                    // height: 40,
                                     child: getButton(data[index].buttons!)),
                               )
                             ],

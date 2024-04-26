@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: MyHomePage(title: "dafsdf"),
+      home: const MyHomePage(title: "dafsdf"),
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -93,17 +93,19 @@ class _MyHomePageState extends State<MyHomePage> {
                       socket: socket!,
                     ))).then((value) async {
           var prefs = await SharedPreferences.getInstance();
-          if (prefs.getBool("cerradoManualmente")! == false) {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return const AlertDialog(
-                  title: Text('Error de conexión'),
-                  content: Text(
-                      'Por favor verifique su conexión de internet e intentelo nuevamente'),
-                );
-              },
-            );
+          if (prefs.getBool("cerradoManualmente") != null) {
+            if (prefs.getBool("cerradoManualmente") == false) {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return const AlertDialog(
+                    title: Text('Error de conexión'),
+                    content: Text(
+                        'Por favor verifique su conexión de internet e intentelo nuevamente'),
+                  );
+                },
+              );
+            }
           }
           SystemNavigator.pop();
         });
