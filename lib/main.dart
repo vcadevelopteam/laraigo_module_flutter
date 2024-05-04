@@ -61,13 +61,6 @@ class _MyHomePageState extends State<MyHomePage> {
     getSharedText();
   }
 
-  initSocketForAndroid() async {
-    var pref = await SharedPreferences.getInstance();
-    if (pref.getString("integrationId") != null) {
-      await _initchatSocket(pref.getString("integrationId"));
-    }
-  }
-
   _initchatSocket(integrationId) async {
     socket = await ChatSocket.getInstance(integrationId);
     colorPreference = socket!.integrationResponse!.metadata!.color!;
@@ -77,14 +70,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> getSharedText() async {
-    var sharedData = await platform.invokeMapMethod('testingSendData');
+    late Map<String, String>? sharedData;
+    try {
+      sharedData =
+          await platform.invokeMapMethod<String, String>('testingSendData');
+    } catch (error) {
+      print(error);
+      sharedData = {"integrationId": "6567ade24933f425469910e1"};
+    }
+
     if (sharedData != null) {
       var pref = await SharedPreferences.getInstance();
-      pref.setString("integrationId", sharedData["integrationId"]);
+      pref.setString("integrationId", sharedData["integrationId"]!);
 
       await _initchatSocket(pref.getString("integrationId"));
       final connection = await ChatSocketRepository.hasNetwork();
-      print("incializando");
+      print("incializando... | connection-state: $connection");
       if (socket != null && connection) {
         Navigator.push(
             context,
