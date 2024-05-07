@@ -68,7 +68,9 @@ class _ChatPageState extends State<ChatPage> {
           widget.socket.disconnect();
 
           await Future.delayed(const Duration(seconds: 5));
-          await initSocket();
+          if (mounted) {
+            await initSocket();
+          }
           setState(() {
             isClosed = false;
           });
