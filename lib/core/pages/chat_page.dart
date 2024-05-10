@@ -67,10 +67,8 @@ class _ChatPageState extends State<ChatPage> {
         if (hasConnection && isClosed == true) {
           widget.socket.disconnect();
 
-          await Future.delayed(const Duration(seconds: 5));
-          if (mounted) {
-            await initSocket();
-          }
+          await Future.delayed(const Duration(seconds: 3));
+          await initSocket();
           setState(() {
             isClosed = false;
           });
@@ -108,44 +106,49 @@ class _ChatPageState extends State<ChatPage> {
       await fillWithChatHistory();
       await sendCustomMessage(widget.customMessage);
     } catch (exception, _) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return const AlertDialog(
-            title: Text('Error general'),
-            content: Text(
-                'Por favor verifique su conexión de internet e intentelo nuevamente'),
-          );
-        },
-      );
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return const AlertDialog(
+              title: Text('Error general'),
+              content: Text(
+                  'Por favor verifique su conexión de internet e intentelo nuevamente'),
+            );
+          },
+        );
+      }
     }
   }
 
   sendCustomMessage(String customMessage) async {
-    if (customMessage.isNotEmpty) {
-      var response = await ChatSocketRepository.sendMessage(
-          customMessage, "null", MessageType.text);
+    var savedMessages = await ChatSocketRepository.getLocalMessages();
+    if (savedMessages.isEmpty) {
+      if (customMessage.isNotEmpty) {
+        var response = await ChatSocketRepository.sendMessage(
+            customMessage, "null", MessageType.text);
 
-      if (response.statusCode != 500 || response.statusCode != 400) {
-        List<MessageResponseData> data = [];
-        data.add(MessageResponseData(
-          message: customMessage,
-        ));
-        var messageSent = MessageResponse(
-                type: MessageType.text.name,
-                isUser: true,
-                error: false,
-                message: MessageSingleResponse(
-                    createdAt: DateTime.now().toUtc().millisecondsSinceEpoch,
-                    data: data,
-                    type: MessageType.text.name,
-                    id: const Uuid().v4().toString()),
-                receptionDate: DateTime.now().toUtc().millisecondsSinceEpoch)
-            .toJson();
+        if (response.statusCode != 500 || response.statusCode != 400) {
+          List<MessageResponseData> data = [];
+          data.add(MessageResponseData(
+            message: customMessage,
+          ));
+          var messageSent = MessageResponse(
+                  type: MessageType.text.name,
+                  isUser: true,
+                  error: false,
+                  message: MessageSingleResponse(
+                      createdAt: DateTime.now().toUtc().millisecondsSinceEpoch,
+                      data: data,
+                      type: MessageType.text.name,
+                      id: const Uuid().v4().toString()),
+                  receptionDate: DateTime.now().toUtc().millisecondsSinceEpoch)
+              .toJson();
 
-        setState(() {
-          widget.socket.controller!.sink.add(messageSent);
-        });
+          setState(() {
+            widget.socket.controller!.sink.add(messageSent);
+          });
+        }
       }
     }
   }
@@ -171,10 +174,12 @@ class _ChatPageState extends State<ChatPage> {
         if (kDebugMode) {
           print("Socket cerrado");
         }
-        setState(() {
-          hasConnection = false;
-          isClosed = true;
-        });
+        if (mounted) {
+          setState(() {
+            hasConnection = false;
+            isClosed = true;
+          });
+        }
 
         // prefs.setBool("cerradoManualmente", false);
       }, onError: (error, stacktrace) async {
@@ -307,9 +312,11 @@ class _ChatPageState extends State<ChatPage> {
                     }
 
                     // ignore: use_build_context_synchronously
-                    Navigator.pop(context);
+                    SystemNavigator.pop();
+                    // Navigator.of(context).pop();
                   } catch (ex) {
-                    Navigator.pop(context);
+                    SystemNavigator.pop();
+                    // Navigator.of(context).pop();
                   }
                 },
                 child: Container(

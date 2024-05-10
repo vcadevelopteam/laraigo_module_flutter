@@ -1,7 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:laraigo_chat_module/core/widget/socket_elevated_button.dart';
 import 'package:laraigo_chat_module/repository/chat_socket_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,6 +53,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = MethodChannel('laraigo_chat_communication_channel');
+  static const _basicMessageChannel = BasicMessageChannel<dynamic>(
+    'laraigo_chat_communication_channel',
+    StandardMessageCodec(),
+  );
+  String? integrationId;
+  String? customMessage;
   String dataShared = 'No data';
   ChatSocket? socket;
   bool isInitialized = false;
@@ -58,7 +67,64 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    getSharedText();
+    executeChannelByDevice();
+    // _listenBasicMessageChannel();
+    // getSharedText();
+  }
+
+  Future<void> executeChannelByDevice() async {
+    if (Platform.isAndroid) _listenPlatformChannel();
+    if (Platform.isIOS) _listenBasicMessageChannel();
+  }
+
+  // Method to access the platform channel - Android
+  Future<void> _listenPlatformChannel() async {
+    final sharedData =
+        await platform.invokeMapMethod<String, String>('testingSendData');
+    print('PlatformChannel init: $sharedData');
+
+    if (sharedData != null) {
+      setState(() {
+        integrationId = sharedData['integrationId'];
+        customMessage = sharedData['customMessage'];
+      });
+
+      final Map<String, String> customMap = {
+        "integrationId": integrationId!,
+        "customMessage": customMessage ?? '',
+      };
+
+      getSharedText(customMap);
+    } else {
+      print('ERROR-Android Execution');
+      throw PlatformException(
+          code: 'Error', message: 'Fallo de carga de datos', details: null);
+    }
+  }
+
+  // Method to access the basic message channel - iOS
+  Future<void> _listenBasicMessageChannel() async {
+    _basicMessageChannel.setMessageHandler((message) async {
+      print('BasicMessageChannel init: $message');
+      if (message != null) {
+        setState(() {
+          integrationId = message['integrationId'] as String;
+          customMessage = message['customMessage'] as String;
+        });
+
+        final Map<String, String> customMap = {
+          "integrationId": integrationId!,
+          "customMessage": customMessage ?? '',
+        };
+        print('BasicMessageChannel final: $customMap');
+
+        getSharedText(customMap);
+      } else {
+        print('ERROR-iOS Execution');
+        throw PlatformException(
+            code: 'Error', message: 'Fallo de carga de datos', details: null);
+      }
+    });
   }
 
   _initchatSocket(integrationId) async {
@@ -69,20 +135,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> getSharedText() async {
-    late Map<String, String>? sharedData;
-    try {
-      sharedData =
-          await platform.invokeMapMethod<String, String>('testingSendData');
-    } catch (error) {
-      print(error);
-      sharedData = {"integrationId": "6567ade24933f425469910e1"};
-    }
-
+  Future<void> getSharedText(Map<String, String>? sharedData) async {
     if (sharedData != null) {
       var pref = await SharedPreferences.getInstance();
       pref.setString("integrationId", sharedData["integrationId"]!);
+      pref.setString("customMessage", sharedData["customMessage"] ?? '');
 
+      print('Antes del socket...');
       await _initchatSocket(pref.getString("integrationId"));
       final connection = await ChatSocketRepository.hasNetwork();
       print("incializando... | connection-state: $connection");
@@ -92,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialPageRoute(
                 builder: (context) => ChatPage(
                       socket: socket!,
+                      customMessage: pref.getString("customMessage") ?? '',
                     ))).then((value) async {
           var prefs = await SharedPreferences.getInstance();
           if (prefs.getBool("cerradoManualmente") != null) {
