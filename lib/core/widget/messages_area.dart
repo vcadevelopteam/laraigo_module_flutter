@@ -192,8 +192,13 @@ class _MessagesAreaState extends State<MessagesArea> {
                           counterExceptions = true;
                         }
 
-                        return MessageButtons(messages[indx].data!,
-                            colorPreference, widget.socket);
+                        return MessageButtons(
+                            messages[indx],
+                            widget.socket.integrationResponse!.metadata!.icons!
+                                .chatHeaderImage!,
+                            messages[indx].data!,
+                            colorPreference,
+                            widget.socket);
                       } else {
                         return Column(
                           children: [
