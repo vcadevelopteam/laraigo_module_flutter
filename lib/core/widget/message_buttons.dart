@@ -2,6 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../helpers/color_convert.dart';
 import '../../helpers/single_tap.dart';
@@ -146,14 +147,20 @@ class _MessageButtonsState extends State<MessageButtons> {
                                                           .color
                                                           .messageClientColor!),
                                                     )),
-                                                onPressed: () {
+                                                onPressed: () async {
                                                   if (mounted) {
                                                     setState(() {
                                                       taped = true;
                                                     });
                                                   }
-                                                  sendMessage(
-                                                      e.payload!, e.text!);
+                                                  if (e.type == 'link') {
+                                                    await launchUrl(
+                                                        Uri.parse(e.uri!));
+                                                    setState(() {});
+                                                  } else {
+                                                    sendMessage(
+                                                        e.payload!, e.text!);
+                                                  }
                                                 },
                                                 child: Text(
                                                   e.text!,
